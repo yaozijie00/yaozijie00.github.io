@@ -4,7 +4,14 @@
       <div class="hero__grid">
         <div class="hero__avatar-wrap">
           <div class="hero__avatar-frame">
-            <img :src="profile.avatar" alt="个人头像" class="hero__avatar" />
+            <img
+              :src="profile.avatar"
+              alt="个人头像"
+              class="hero__avatar"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+            />
           </div>
         </div>
 

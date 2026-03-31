@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <nav :class="['navbar', { 'navbar--scrolled': isScrolled }]">
     <div class="navbar__inner">
       <div class="navbar__brand">
@@ -215,4 +215,15 @@ onUnmounted(() => {
     display: none;
   }
 }
+
+@media (max-width: 640px) {
+  .navbar {
+    padding: 0.75rem 1rem;
+  }
+
+  .navbar__title {
+    font-size: 1rem;
+  }
+}
 </style>
+

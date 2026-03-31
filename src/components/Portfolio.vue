@@ -13,12 +13,12 @@
               <video
                 v-if="currentItem.type === 'video'"
                 :src="currentItem.src"
+                :poster="currentItem.thumbnail"
                 class="portfolio__media-asset"
-                autoplay
-                muted
                 loop
                 playsinline
                 controls
+                preload="metadata"
               >
                 您的浏览器不支持视频播放
               </video>
@@ -33,6 +33,8 @@
                 :src="currentItem.src"
                 :alt="currentItem.title"
                 class="portfolio__media-asset"
+                loading="lazy"
+                decoding="async"
               />
               <figcaption class="portfolio__caption">
                 <h3 class="portfolio__caption-title">{{ currentItem.title }}</h3>
@@ -54,7 +56,13 @@
             :class="['portfolio__thumb', index === currentIndex ? 'portfolio__thumb--active' : '']"
             @click="selectItem(index)"
           >
-            <img :src="item.thumbnail" :alt="item.title" class="portfolio__thumb-img" />
+            <img
+              :src="item.thumbnail"
+              :alt="item.title"
+              class="portfolio__thumb-img"
+              loading="lazy"
+              decoding="async"
+            />
             <div class="portfolio__thumb-overlay"></div>
             <div class="portfolio__thumb-info">
               <p class="portfolio__thumb-title">{{ item.title }}</p>
@@ -273,6 +281,32 @@ const selectItem = (index) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+@media (max-width: 640px) {
+  .portfolio__panel {
+    padding: 1.25rem;
+  }
+
+  .portfolio__caption {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 1rem;
+    max-width: 100%;
+  }
+
+  .portfolio__caption-title {
+    font-size: 0.9rem;
+  }
+
+  .portfolio__caption-text {
+    font-size: 0.72rem;
+  }
+
+  .portfolio__thumb {
+    width: 9rem;
+    height: 5.25rem;
+  }
 }
 
 @media (min-width: 768px) {

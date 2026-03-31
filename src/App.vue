@@ -50,4 +50,14 @@ import {
   flex-direction: column;
   gap: 5rem;
 }
+
+@media (max-width: 640px) {
+  .app__main {
+    padding: 5rem 1rem 3rem;
+  }
+
+  .app__content {
+    gap: 3.5rem;
+  }
+}
 </style>

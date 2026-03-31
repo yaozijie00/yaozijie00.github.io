@@ -71,7 +71,7 @@ defineProps({
 
 .tech__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.5rem;
 }
 
@@ -153,6 +153,12 @@ defineProps({
 .tech__icon--slate {
   border-color: rgba(148, 163, 184, 0.4);
   color: #cbd5e1;
+}
+
+@media (min-width: 540px) {
+  .tech__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 640px) {

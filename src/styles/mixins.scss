@@ -1,0 +1,59 @@
+$glass-bg: rgba(255, 255, 255, 0.05);
+$glass-border: rgba(34, 211, 238, 0.2);
+$glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+
+@mixin glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.5rem;
+  box-shadow: var(--glass-shadow), 0 0 40px rgba(34, 211, 238, 0.05);
+
+  @media (max-width: 768px) {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+@mixin glass-strong {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.08);
+}
+
+@mixin glass-cold {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-top: 1px solid rgba(34, 211, 238, 0.5);
+  border-left: 1px solid rgba(34, 211, 238, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 20px rgba(34, 211, 238, 0.1);
+}
+
+@mixin glass-cold-hover {
+  &:hover {
+    border-color: rgba(34, 211, 238, 0.6);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      0 0 30px rgba(34, 211, 238, 0.2);
+  }
+}
+
+@mixin hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px 0 rgba(34, 211, 238, 0.15);
+  }
+}
+
+@mixin transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}

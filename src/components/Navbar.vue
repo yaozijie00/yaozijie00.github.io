@@ -89,18 +89,53 @@ onUnmounted(() => {
   right: 0;
   z-index: 50;
   padding: 1rem 1.5rem;
-  background: rgba(2, 6, 23, 0.6);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 1px solid rgba(34, 211, 238, 0.1);
-  box-shadow: 0 4px 30px rgba(34, 211, 238, 0.05);
+  background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 45%,
+      rgba(0, 0, 0, 0.1) 100%
+    ),
+    rgba(8, 12, 28, 0.35);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(5, 10, 25, 0.35);
   transition: all 0.3s ease;
+  overflow: hidden;
 }
 
 .navbar--scrolled {
-  background: rgba(2, 6, 23, 0.85);
-  border-bottom: 1px solid rgba(34, 211, 238, 0.2);
-  box-shadow: 0 8px 40px rgba(34, 211, 238, 0.1);
+  background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.04) 55%,
+      rgba(0, 0, 0, 0.18) 100%
+    ),
+    rgba(8, 12, 28, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 50px rgba(5, 10, 25, 0.45);
+}
+
+.navbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08) 0, transparent 35%),
+    radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.06) 0, transparent 40%),
+    repeating-linear-gradient(
+      125deg,
+      rgba(255, 255, 255, 0.06) 0px,
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.navbar--scrolled::before {
+  opacity: 0.75;
 }
 
 .navbar__inner {
@@ -109,6 +144,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 1;
 }
 
 .navbar__brand {
@@ -183,6 +220,8 @@ onUnmounted(() => {
   border-radius: 1rem;
   padding: 1rem;
   @include glass-strong;
+  position: relative;
+  z-index: 1;
 }
 
 .navbar__mobile-links {

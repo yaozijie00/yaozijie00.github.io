@@ -17,6 +17,7 @@
           :src="section.file"
           class="pdf__frame"
           :title="section.title"
+          loading="lazy"
         >
           您的浏览器不支持内嵌 PDF 预览，请点击下方按钮下载。
         </iframe>
@@ -57,7 +58,8 @@ defineProps({
 });
 
 const openNewTab = (url) => {
-  window.open(url, '_blank');
+  const win = window.open(url, '_blank', 'noopener');
+  if (win) win.opener = null;
 };
 </script>
 
@@ -146,10 +148,6 @@ const openNewTab = (url) => {
 @media (min-width: 768px) {
   .pdf__title {
     font-size: 2.5rem;
-  }
-
-  .pdf__panel {
-    padding: 2rem;
   }
 
   .pdf__frame {

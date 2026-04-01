@@ -1,9 +1,9 @@
 ﻿export const sections = [
-  { id: 'about', label: '艺术方向' },
+  { id: 'about', label: '个人简介' },
   { id: 'tech-stack', label: '技术栈' },
   { id: 'experience', label: '履历' },
   { id: 'portfolio', label: '作品陈列' },
-  { id: 'resume', label: '简历' },
+  { id: 'resume', label: '简历PDF' },
   { id: 'contact', label: '联系方式' }
 ];
 
@@ -75,8 +75,15 @@ export const portfolioItems = [
     type: 'marmoset',
     src: '/assets/models/MVS_AR.mview',
     thumbnail: '/assets/works/Pic_AR_03.png',
-    title: '模型展示',
+    title: '硬表面枪械',
     description: 'Marmoset Viewer 渲染展示'
+  },
+    {
+    type: 'image',
+    src: '/assets/works/Pic_Foliage01.png',
+    thumbnail: '/assets/works/Pic_Foliage01.png',
+    title: '植物资产',
+    description: 'ST植物资产制作'
   },
   {
     type: 'image',
@@ -85,19 +92,19 @@ export const portfolioItems = [
     title: '森林环境',
     description: '全流程森林场景构建'
   },
+    {
+    type: 'image',
+    src: '/assets/works/Pic_AbandonedRoom_Final.png',
+    thumbnail: '/assets/works/Pic_AbandonedRoom_Final.png',
+    title: '废弃公寓静帧',
+    description: '写实场景氛围静帧'
+  },
   {
     type: 'video',
     src: '/assets/works/AbandonedRoom_Final.mp4',
     thumbnail: '/assets/works/Pic_AbandonedRoom_Final.png',
     title: '废弃公寓',
     description: '写实风格场景展示'
-  },
-  {
-    type: 'image',
-    src: '/assets/works/Pic_AbandonedRoom_Final.png',
-    thumbnail: '/assets/works/Pic_AbandonedRoom_Final.png',
-    title: '废弃公寓（静帧）',
-    description: '写实场景氛围静帧'
   },
 ];
 

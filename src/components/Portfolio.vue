@@ -47,13 +47,18 @@
         </figure>
       </div>
 
-      <div class="portfolio__thumbs">
+      <div class="portfolio__thumbs" ref="thumbsRef" @wheel="onThumbWheel" @scroll="onThumbScroll">
         <div class="portfolio__thumbs-row">
           <button
             v-for="(item, index) in props.items"
             :key="item.title"
             type="button"
-            :class="['portfolio__thumb', index === currentIndex ? 'portfolio__thumb--active' : '']"
+            :class="[
+              'portfolio__thumb',
+              index === currentIndex ? 'portfolio__thumb--active' : '',
+              bounceTarget === 'start' && index === 0 ? 'portfolio__thumb--bounce-start' : '',
+              bounceTarget === 'end' && index === props.items.length - 1 ? 'portfolio__thumb--bounce-end' : ''
+            ]"
             @click="selectItem(index)"
           >
             <img
@@ -79,7 +84,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref } from 'vue';
 import MarmosetViewer from './MarmosetViewer.vue';
 
 const props = defineProps({
@@ -90,6 +95,10 @@ const props = defineProps({
 });
 
 const currentIndex = ref(0);
+const thumbsRef = ref(null);
+const bounceTarget = ref(null);
+const bounceTimer = ref(null);
+const edgeRaf = ref(null);
 
 const currentItem = computed(() => {
   return Array.isArray(props.items) && props.items.length > 0 ? props.items[currentIndex.value] : {};
@@ -99,6 +108,67 @@ const selectItem = (index) => {
   if (index === currentIndex.value) return;
   currentIndex.value = index;
 };
+
+const onThumbWheel = (event) => {
+  const container = thumbsRef.value;
+  if (!container) return;
+  if (!hasThumbOverflow(container)) return;
+  event.preventDefault();
+  const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+  container.scrollLeft += delta;
+  scheduleEdgeCheck();
+};
+
+const onThumbScroll = () => {
+  scheduleEdgeCheck();
+};
+
+const hasThumbOverflow = (container) => {
+  return container.scrollWidth > container.clientWidth + 1;
+};
+
+const scheduleEdgeCheck = () => {
+  if (edgeRaf.value) return;
+  edgeRaf.value = requestAnimationFrame(() => {
+    edgeRaf.value = null;
+    checkThumbEdges();
+  });
+};
+
+const checkThumbEdges = () => {
+  const container = thumbsRef.value;
+  if (!container) return;
+  if (!hasThumbOverflow(container)) return;
+  const maxScroll = container.scrollWidth - container.clientWidth;
+  const edgeTolerance = 2;
+  if (container.scrollLeft <= edgeTolerance) {
+    triggerBounce('start');
+  } else if (container.scrollLeft >= maxScroll - edgeTolerance) {
+    triggerBounce('end');
+  }
+};
+
+const triggerBounce = (target) => {
+  if (bounceTimer.value) {
+    clearTimeout(bounceTimer.value);
+    bounceTimer.value = null;
+  }
+  bounceTarget.value = target;
+  bounceTimer.value = setTimeout(() => {
+    bounceTarget.value = null;
+  }, 420);
+};
+
+onBeforeUnmount(() => {
+  if (bounceTimer.value) {
+    clearTimeout(bounceTimer.value);
+    bounceTimer.value = null;
+  }
+  if (edgeRaf.value) {
+    cancelAnimationFrame(edgeRaf.value);
+    edgeRaf.value = null;
+  }
+});
 </script>
 
 <style scoped lang="scss">
@@ -271,6 +341,38 @@ const selectItem = (index) => {
   inset: 0;
   border: 2px solid #818cf8;
   border-radius: 0.75rem;
+}
+
+.portfolio__thumb--bounce-start {
+  animation: bounce-start 0.42s ease;
+}
+
+.portfolio__thumb--bounce-end {
+  animation: bounce-end 0.42s ease;
+}
+
+@keyframes bounce-start {
+  0% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounce-end {
+  0% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(-10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .fade-enter-active,

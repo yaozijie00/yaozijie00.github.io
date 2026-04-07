@@ -63,6 +63,7 @@ const activeSectionId = ref('');
 const linksRef = ref(null);
 const linkRefs = ref({});
 const indicatorStyle = ref({});
+const sectionsInDomRef = ref([]);
 let observer;
 let resizeTimer;
 let resizeHandler;
@@ -75,8 +76,33 @@ const closeMenu = () => {
   isMenuOpen.value = false;
 };
 
+const BOTTOM_TOLERANCE = 6;
+
+const isAtBottom = () => {
+  const scrollElement = document.documentElement;
+  const scrollTop = window.scrollY || scrollElement.scrollTop;
+  const viewportBottom = Math.ceil(scrollTop + window.innerHeight);
+  return viewportBottom >= scrollElement.scrollHeight - BOTTOM_TOLERANCE;
+};
+
+const forceLastSectionActive = () => {
+  const sectionsInDom = sectionsInDomRef.value;
+  if (!sectionsInDom.length) return false;
+  const lastSection = sectionsInDom[sectionsInDom.length - 1];
+  if (!lastSection) return false;
+  if (activeSectionId.value !== lastSection.id) {
+    activeSectionId.value = lastSection.id;
+  }
+  return true;
+};
+
 const onScroll = () => {
   isScrolled.value = window.scrollY > 10;
+  if (isAtBottom()) {
+    if (forceLastSectionActive()) {
+      nextTick(updateIndicator);
+    }
+  }
 };
 
 const setLinkRef = (el, id) => {
@@ -132,6 +158,7 @@ onMounted(() => {
   const sectionsInDom = props.sections
     .map((section) => document.getElementById(section.id))
     .filter(Boolean);
+  sectionsInDomRef.value = sectionsInDom;
 
   if (sectionsInDom.length) {
     activeSectionId.value = sectionsInDom[0].id;
@@ -163,6 +190,10 @@ onMounted(() => {
         }
       } else {
         pickActiveFromViewport(sectionsInDom);
+      }
+
+      if (isAtBottom()) {
+        forceLastSectionActive();
       }
 
       nextTick(updateIndicator);

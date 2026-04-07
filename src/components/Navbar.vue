@@ -10,14 +10,17 @@
         <span class="navbar__title">姚梓杰 | 个人作品集</span>
       </div>
 
-      <div class="navbar__links">
+      <div class="navbar__links" ref="linksRef">
+        <div class="navbar__indicator" :style="indicatorStyle" aria-hidden="true"></div>
         <a
           v-for="section in sections"
           :key="section.id"
           :href="`#${section.id}`"
-          class="navbar__link"
+          :class="['navbar__link', activeSectionId === section.id ? 'navbar__link--active' : '']"
         >
-          {{ section.label }}
+          <span :ref="(el) => setLinkRef(el, section.id)" class="navbar__link-text">
+            {{ section.label }}
+          </span>
         </a>
       </div>
 
@@ -45,9 +48,9 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 
-defineProps({
+const props = defineProps({
   sections: {
     type: Array,
     required: true
@@ -56,6 +59,13 @@ defineProps({
 
 const isMenuOpen = ref(false);
 const isScrolled = ref(false);
+const activeSectionId = ref('');
+const linksRef = ref(null);
+const linkRefs = ref({});
+const indicatorStyle = ref({});
+let observer;
+let resizeTimer;
+let resizeHandler;
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -69,13 +79,120 @@ const onScroll = () => {
   isScrolled.value = window.scrollY > 10;
 };
 
+const setLinkRef = (el, id) => {
+  if (el) {
+    linkRefs.value[id] = el;
+  }
+};
+
+const updateIndicator = () => {
+  const container = linksRef.value;
+  const link = linkRefs.value[activeSectionId.value];
+  if (!container || !link) return;
+
+  const containerRect = container.getBoundingClientRect();
+  const linkRect = link.getBoundingClientRect();
+  const padding = 10;
+  const left = linkRect.left - containerRect.left - padding;
+  const width = linkRect.width + padding * 2;
+  const height = linkRect.height + 6;
+  const centerY = linkRect.top - containerRect.top + linkRect.height / 2;
+
+  indicatorStyle.value = {
+    left: `${left}px`,
+    top: `${centerY}px`,
+    width: `${width}px`,
+    height: `${height}px`
+  };
+};
+
+const pickActiveFromViewport = (sectionsInDom) => {
+  if (!sectionsInDom.length) return;
+  let bestId = sectionsInDom[0].id;
+  let bestScore = Infinity;
+
+  sectionsInDom.forEach((section) => {
+    const rect = section.getBoundingClientRect();
+    const distance = Math.abs(rect.top - window.innerHeight * 0.32);
+    if (distance < bestScore) {
+      bestScore = distance;
+      bestId = section.id;
+    }
+  });
+
+  if (bestId && bestId !== activeSectionId.value) {
+    activeSectionId.value = bestId;
+  }
+};
+
 onMounted(() => {
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
+
+  const sectionsInDom = props.sections
+    .map((section) => document.getElementById(section.id))
+    .filter(Boolean);
+
+  if (sectionsInDom.length) {
+    activeSectionId.value = sectionsInDom[0].id;
+  }
+
+  const ratioMap = new Map();
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          ratioMap.set(entry.target.id, entry.intersectionRatio);
+        } else {
+          ratioMap.delete(entry.target.id);
+        }
+      });
+
+      if (ratioMap.size) {
+        let bestId = '';
+        let bestRatio = 0;
+        ratioMap.forEach((ratio, id) => {
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestId = id;
+          }
+        });
+        if (bestId) {
+          activeSectionId.value = bestId;
+        }
+      } else {
+        pickActiveFromViewport(sectionsInDom);
+      }
+
+      nextTick(updateIndicator);
+    },
+    {
+      threshold: [0.15, 0.3, 0.5, 0.75],
+      rootMargin: '-20% 0px -55% 0px'
+    }
+  );
+
+  sectionsInDom.forEach((section) => observer.observe(section));
+
+  nextTick(updateIndicator);
+  resizeHandler = () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      updateIndicator();
+    }, 120);
+  };
+  window.addEventListener('resize', resizeHandler);
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll);
+  if (resizeHandler) {
+    window.removeEventListener('resize', resizeHandler);
+  }
+  if (observer) {
+    observer.disconnect();
+  }
 });
 </script>
 
@@ -182,18 +299,75 @@ onUnmounted(() => {
 .navbar__links {
   display: none;
   align-items: center;
-  gap: 2rem;
+  gap: 1.6rem;
+  position: relative;
+  padding: 0.35rem 0.45rem;
+  border-radius: 999px;
+}
+
+.navbar__indicator {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 2.3rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(6, 10, 24, 0.96), rgba(15, 23, 42, 0.78));
+  border: 1px solid rgba(56, 189, 248, 0.16);
+  box-shadow:
+    0 10px 22px rgba(2, 6, 23, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 18px rgba(56, 189, 248, 0.22);
+  transform: translateX(0) translateY(-50%);
+  transition:
+    transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1),
+    width 0.45s cubic-bezier(0.34, 1.4, 0.64, 1),
+    height 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+  pointer-events: none;
+  z-index: 0;
+  filter: saturate(120%);
+}
+
+.navbar__indicator::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 25% 50%, rgba(56, 189, 248, 0.22), transparent 55%);
+  opacity: 0.7;
+}
+
+.navbar__indicator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -18px;
+  width: 36px;
+  height: 70%;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 50%, rgba(56, 189, 248, 0.26), transparent 65%);
+  filter: blur(8px);
+  opacity: 0.65;
+  transition: width 0.45s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 .navbar__link {
   color: #d1d5db;
   text-decoration: none;
   font-size: 0.95rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  position: relative;
+  z-index: 1;
   transition: color 0.2s ease;
 }
 
 .navbar__link:hover {
   color: #67e8f9;
+}
+
+.navbar__link--active {
+  color: #e0f2fe;
 }
 
 .navbar__menu-btn {

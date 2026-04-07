@@ -2,7 +2,7 @@
   <section id="tech-stack" class="tech" style="animation-delay: 0.25s;">
     <div class="tech__header">
       <h2 class="tech__title">
-        <span class="tech__title-accent">技术栈</span>
+        <span class="tech__title-accent">技术</span>栈
       </h2>
       <p class="tech__subtitle">熟练使用的创作工具</p>
     </div>

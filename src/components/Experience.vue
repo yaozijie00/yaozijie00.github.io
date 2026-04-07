@@ -95,14 +95,17 @@ defineProps({
   position: relative;
   padding: 2rem;
   @include glass-cold;
+  --timeline-line-x: 0.5rem;
+  --timeline-dot-size: 1rem;
+  --timeline-line-width: 2px;
 }
 
 .timeline__line {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0;
-  width: 2px;
+  left: calc(var(--timeline-line-x) - (var(--timeline-line-width) / 2));
+  width: var(--timeline-line-width);
   background: linear-gradient(to bottom, rgba(34, 211, 238, 0.5), rgba(34, 211, 238, 0.3), transparent);
 }
 
@@ -111,6 +114,7 @@ defineProps({
   flex-direction: column;
   gap: 2rem;
   position: relative;
+  width: 100%;
 }
 
 .timeline__item {
@@ -120,14 +124,15 @@ defineProps({
   animation: slideInLeft 0.6s ease forwards;
   animation-delay: var(--delay);
   opacity: 0;
+  width: 100%;
 }
 
 
 .timeline__dot {
   position: absolute;
-  left: 0;
-  width: 1rem;
-  height: 1rem;
+  left: calc(var(--timeline-line-x) - (var(--timeline-dot-size) / 2));
+  width: var(--timeline-dot-size);
+  height: var(--timeline-dot-size);
   border-radius: 50%;
   background: #22d3ee;
   border: 4px solid #0f172a;
@@ -218,12 +223,12 @@ defineProps({
   }
 
   .timeline__line {
-    left: 50%;
+    left: var(--timeline-line-x);
     transform: translateX(-50%);
   }
 
   .timeline__dot {
-    left: 50%;
+    left: var(--timeline-line-x);
     transform: translateX(-50%);
   }
 
@@ -240,6 +245,10 @@ defineProps({
   .timeline__card-wrap--right {
     padding-right: 0;
     padding-left: 3rem;
+  }
+
+  .timeline__panel {
+    --timeline-line-x: 50%;
   }
 }
 </style>

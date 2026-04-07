@@ -9,7 +9,7 @@
       <div class="portfolio__viewer">
         <figure class="portfolio__figure">
           <transition name="fade" mode="out-in">
-            <div :key="currentItem.title" class="portfolio__media">
+            <div :key="currentItem.src || currentItem.title" class="portfolio__media">
               <video
                 v-if="currentItem.type === 'video'"
                 :src="currentItem.src"
@@ -51,7 +51,7 @@
         <div class="portfolio__thumbs-row">
           <button
             v-for="(item, index) in props.items"
-            :key="item.title"
+            :key="`${item.type}-${item.src}-${index}`"
             type="button"
             :class="[
               'portfolio__thumb',

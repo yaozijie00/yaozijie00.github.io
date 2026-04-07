@@ -71,14 +71,14 @@ export const portfolioItems = [
     title: '硬表面枪械',
     description: '硬表面模型制作'
   },
-    {
+  {
     type: 'marmoset',
     src: '/assets/models/MVS_AR.mview',
     thumbnail: '/assets/works/Pic_AR_03.png',
     title: '硬表面枪械',
     description: 'Marmoset Viewer 渲染展示'
   },
-    {
+  {
     type: 'image',
     src: '/assets/works/Pic_Foliage01.png',
     thumbnail: '/assets/works/Pic_Foliage01.png',
@@ -92,7 +92,7 @@ export const portfolioItems = [
     title: '森林环境',
     description: '全流程森林场景构建'
   },
-    {
+  {
     type: 'image',
     src: '/assets/works/Pic_AbandonedRoom_Final.png',
     thumbnail: '/assets/works/Pic_AbandonedRoom_Final.png',
@@ -105,7 +105,7 @@ export const portfolioItems = [
     thumbnail: '/assets/works/Pic_AbandonedRoom_Final.png',
     title: '废弃公寓',
     description: '写实风格场景展示'
-  },
+  }
 ];
 
 export const pdfSections = [
@@ -143,3 +143,22 @@ export const contactInfo = [
     value: '中国·深圳'
   }
 ];
+
+export const newsTicker = {
+  topMessages: [
+    '欢迎来到我的个人站点',
+    '编程学习中ing~',
+    '正在发布新的作品集',
+    '学习是第一驱动力',
+    '新增了交互动效展示',
+    '感谢你的关注'
+  ],
+  bottomMessages: [
+    '建模PBR全流程',
+    '建模手绘风格化全流程',
+    'UE地编全流程',
+    'SpeedTree植物资产制作',
+    '环境美术/关卡美术',
+    '欢迎一起交流合作'
+  ]
+};

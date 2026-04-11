@@ -66,7 +66,7 @@ const { topMessages, bottomMessages } = newsTicker;
   border-radius: 1.1rem;
   padding: 0.95rem 0;
   @include glass-cold;
-  background: rgba(9, 14, 28, 0.7);
+  background: rgba(24, 36, 58, 0.55);
   border: 1px solid rgba(34, 211, 238, 0.12);
   box-shadow: 0 18px 45px rgba(2, 6, 23, 0.4);
 }
@@ -84,12 +84,12 @@ const { topMessages, bottomMessages } = newsTicker;
 
 .ticker__row::before {
   left: 0;
-  background: linear-gradient(90deg, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0));
+  background: linear-gradient(90deg, rgba(24, 36, 58, 0.7), rgba(24, 36, 58, 0));
 }
 
 .ticker__row::after {
   right: 0;
-  background: linear-gradient(270deg, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0));
+  background: linear-gradient(270deg, rgba(24, 36, 58, 0.7), rgba(24, 36, 58, 0));
 }
 
 .ticker__track {

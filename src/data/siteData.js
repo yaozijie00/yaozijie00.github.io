@@ -80,15 +80,22 @@ export const portfolioItems = [
   },
   {
     type: 'image',
-    src: '/assets/works/Pic_Foliage01.png',
-    thumbnail: '/assets/works/Pic_Foliage01.png',
+    src: '/assets/works/Pic_FoliageAssests_01.png',
+    thumbnail: '/assets/works/Pic_FoliageAssests_01.png',
     title: '植物资产',
     description: 'ST植物资产制作'
   },
   {
     type: 'image',
-    src: '/assets/works/Pic_ForestEnviroment.png',
-    thumbnail: '/assets/works/Pic_ForestEnviroment.png',
+    src: '/assets/works/Pic_ForestEnviroment_01.png',
+    thumbnail: '/assets/works/Pic_ForestEnviroment_01.png',
+    title: '森林环境',
+    description: '全流程森林场景构建'
+  },
+    {
+    type: 'image',
+    src: '/assets/works/Pic_ForestEnviroment_02.png',
+    thumbnail: '/assets/works/Pic_ForestEnviroment_02.png',
     title: '森林环境',
     description: '全流程森林场景构建'
   },

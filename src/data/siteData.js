@@ -59,57 +59,92 @@ export const timelineData = [
 export const portfolioItems = [
   {
     type: 'image',
-    src: '/assets/works/Pic_AR_01.png',
-    thumbnail: '/assets/works/Pic_AR_01.png',
+    src: '/assets/works/Gun/Pic_AR_01.png',
+    thumbnail: '/assets/works/Gun/Pic_AR_01.png',
     title: '硬表面枪械',
     description: '硬表面模型制作'
   },
   {
     type: 'image',
-    src: '/assets/works/Pic_AR_02.png',
-    thumbnail: '/assets/works/Pic_AR_02.png',
+    src: '/assets/works/Gun/Pic_AR_02.png',
+    thumbnail: '/assets/works/Gun/Pic_AR_02.png',
     title: '硬表面枪械',
     description: '硬表面模型制作'
   },
   {
     type: 'marmoset',
     src: '/assets/models/MVS_AR.mview',
-    thumbnail: '/assets/works/Pic_AR_03.png',
+    thumbnail: '/assets/works/Gun/Pic_AR_03.png',
     title: '硬表面枪械',
     description: 'Marmoset Viewer 渲染展示'
   },
   {
     type: 'image',
-    src: '/assets/works/Pic_FoliageAssests_01.png',
-    thumbnail: '/assets/works/Pic_FoliageAssests_01.png',
+    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_01.png',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_01.png',
     title: '植物资产',
     description: 'ST植物资产制作'
   },
   {
     type: 'image',
-    src: '/assets/works/Pic_ForestEnviroment_01.png',
-    thumbnail: '/assets/works/Pic_ForestEnviroment_01.png',
-    title: '森林环境',
-    description: '全流程森林场景构建'
+    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_02.png',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_02.png',
+    title: '植物资产',
+    description: 'ST植物资产制作'
   },
-    {
+  {
     type: 'image',
-    src: '/assets/works/Pic_ForestEnviroment_02.png',
-    thumbnail: '/assets/works/Pic_ForestEnviroment_02.png',
+    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_03.png',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_03.png',
+    title: '植物资产',
+    description: 'ST植物资产制作'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_04.png',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_04.png',
+    title: '植物资产',
+    description: 'ST植物资产制作'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
     title: '森林环境',
     description: '全流程森林场景构建'
   },
   {
     type: 'image',
-    src: '/assets/works/Pic_AbandonedRoom_Final.png',
-    thumbnail: '/assets/works/Pic_AbandonedRoom_Final.png',
-    title: '废弃公寓静帧',
+    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_02.png',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_02.png',
+    title: '森林环境',
+    description: '全流程森林场景构建'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_03.png',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_03.png',
+    title: '森林环境',
+    description: '全流程森林场景构建'
+  },
+  {
+    type: 'video',
+    src: '/assets/works/ForestEnviroment/ForestEnviroment_Final_web.mp4',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
+    title: '森林环境',
+    description: '全流程森林场景构建'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.png',
+    thumbnail: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.png',
+    title: '废弃公寓',
     description: '写实场景氛围静帧'
   },
   {
     type: 'video',
-    src: '/assets/works/AbandonedRoom_Final.mp4',
-    thumbnail: '/assets/works/Pic_AbandonedRoom_Final.png',
+    src: '/assets/works/AbandonRoom/AbandonedRoom_Final_web.mp4',
+    thumbnail: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.png',
     title: '废弃公寓',
     description: '写实风格场景展示'
   }

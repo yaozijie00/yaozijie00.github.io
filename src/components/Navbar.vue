@@ -10,7 +10,7 @@
         <span class="navbar__title">姚梓杰 | 个人作品集</span>
       </div>
 
-      <div class="navbar__links" ref="linksRef">
+      <div ref="linksRef" class="navbar__links">
         <div class="navbar__indicator" :style="indicatorStyle" aria-hidden="true"></div>
         <a
           v-for="section in sections"
@@ -24,14 +24,21 @@
         </a>
       </div>
 
-      <button class="navbar__menu-btn" @click="toggleMenu">
+      <button
+        class="navbar__menu-btn"
+        type="button"
+        :aria-expanded="isMenuOpen ? 'true' : 'false'"
+        aria-controls="navbar-mobile-menu"
+        aria-label="切换导航菜单"
+        @click="toggleMenu"
+      >
         <svg class="navbar__menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </div>
 
-    <div v-show="isMenuOpen" class="navbar__mobile">
+    <div v-show="isMenuOpen" id="navbar-mobile-menu" class="navbar__mobile">
       <div class="navbar__mobile-links">
         <a
           v-for="section in sections"
@@ -48,7 +55,7 @@
 </template>
 
 <script setup>
-import { nextTick, onMounted, onUnmounted, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps({
   sections: {
@@ -65,8 +72,9 @@ const linkRefs = ref({});
 const indicatorStyle = ref({});
 const sectionsInDomRef = ref([]);
 let observer;
-let resizeTimer;
 let resizeHandler;
+let resizeRaf;
+let scrollRaf;
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -96,13 +104,21 @@ const forceLastSectionActive = () => {
   return true;
 };
 
-const onScroll = () => {
+const performScrollSync = () => {
   isScrolled.value = window.scrollY > 10;
   if (isAtBottom()) {
     if (forceLastSectionActive()) {
       nextTick(updateIndicator);
     }
   }
+};
+
+const onScroll = () => {
+  if (scrollRaf) return;
+  scrollRaf = requestAnimationFrame(() => {
+    scrollRaf = null;
+    performScrollSync();
+  });
 };
 
 const setLinkRef = (el, id) => {
@@ -152,7 +168,7 @@ const pickActiveFromViewport = (sectionsInDom) => {
 };
 
 onMounted(() => {
-  onScroll();
+  performScrollSync();
   window.addEventListener('scroll', onScroll, { passive: true });
 
   const sectionsInDom = props.sections
@@ -208,19 +224,39 @@ onMounted(() => {
 
   nextTick(updateIndicator);
   resizeHandler = () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
+    if (resizeRaf) {
+      cancelAnimationFrame(resizeRaf);
+    }
+    resizeRaf = requestAnimationFrame(() => {
+      resizeRaf = null;
       updateIndicator();
-    }, 120);
+    });
   };
   window.addEventListener('resize', resizeHandler);
 });
 
+watch(
+  () => isMenuOpen.value,
+  (open) => {
+    if (window.innerWidth >= 768) return;
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+);
+
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll);
+  if (scrollRaf) {
+    cancelAnimationFrame(scrollRaf);
+    scrollRaf = null;
+  }
+  if (resizeRaf) {
+    cancelAnimationFrame(resizeRaf);
+    resizeRaf = null;
+  }
   if (resizeHandler) {
     window.removeEventListener('resize', resizeHandler);
   }
+  document.body.style.overflow = '';
   if (observer) {
     observer.disconnect();
   }

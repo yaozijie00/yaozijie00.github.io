@@ -1,0 +1,4 @@
+dist
+node_modules
+public/assets/works/**/*.mp4
+public/assets/models/**/*.mview

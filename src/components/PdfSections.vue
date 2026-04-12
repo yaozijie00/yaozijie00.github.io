@@ -1,8 +1,9 @@
 ﻿<template>
   <section
     v-for="section in sections"
-    :key="section.id"
     :id="section.id"
+    :key="section.id"
+    :ref="(el) => setPdfSectionRef(el, section.id)"
     class="pdf"
     style="animation-delay: 0.4s;"
   >
@@ -14,7 +15,7 @@
     <div class="pdf__panel">
       <div class="pdf__viewer">
         <iframe
-          :src="section.file"
+          :src="isPdfLoaded(section.id) ? section.file : undefined"
           class="pdf__frame"
           :title="section.title"
           loading="lazy"
@@ -50,6 +51,8 @@
 </template>
 
 <script setup>
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+
 defineProps({
   sections: {
     type: Array,
@@ -57,10 +60,60 @@ defineProps({
   }
 });
 
+const pdfSectionRefs = ref({});
+const loadedPdfMap = ref({});
+let pdfObserver = null;
+
+const setPdfSectionRef = (el, id) => {
+  if (!el) return;
+  pdfSectionRefs.value[id] = el;
+};
+
+const markPdfLoaded = (id) => {
+  if (loadedPdfMap.value[id]) return;
+  loadedPdfMap.value = {
+    ...loadedPdfMap.value,
+    [id]: true
+  };
+};
+
+const isPdfLoaded = (id) => Boolean(loadedPdfMap.value[id]);
+
 const openNewTab = (url) => {
   const win = window.open(url, '_blank', 'noopener');
   if (win) win.opener = null;
 };
+
+onMounted(async () => {
+  await nextTick();
+  if (!('IntersectionObserver' in window)) {
+    Object.keys(pdfSectionRefs.value).forEach(markPdfLoaded);
+    return;
+  }
+  pdfObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.id;
+        if (!id) return;
+        markPdfLoaded(id);
+        pdfObserver?.unobserve(entry.target);
+      });
+    },
+    {
+      rootMargin: '300px 0px'
+    }
+  );
+
+  Object.values(pdfSectionRefs.value).forEach((el) => {
+    pdfObserver?.observe(el);
+  });
+});
+
+onBeforeUnmount(() => {
+  pdfObserver?.disconnect();
+  pdfObserver = null;
+});
 </script>
 
 <style scoped lang="scss">

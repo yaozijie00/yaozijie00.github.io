@@ -53,6 +53,11 @@ import {
   gap: 4.25rem;
 }
 
+.app__content > * {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
+}
+
 @media (max-width: 640px) {
   .app__main {
     padding: 5rem 1rem 3rem;

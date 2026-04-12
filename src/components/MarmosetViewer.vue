@@ -56,6 +56,7 @@ const showPlayOverlay = computed(() => !hasStarted.value && !isLoading.value && 
 
 let viewerInstance = null;
 let resizeObserver = null;
+let initRequestId = 0;
 
 const loadMarmoset = (() => {
   let promise;
@@ -85,6 +86,12 @@ const clearViewer = () => {
   viewerInstance = null;
 };
 
+const clearResizeObserver = () => {
+  if (!resizeObserver) return;
+  resizeObserver.disconnect();
+  resizeObserver = null;
+};
+
 const startLoading = () => {
   if (!viewerInstance) return;
   if (hasStarted.value || isLoading.value) return;
@@ -94,9 +101,11 @@ const startLoading = () => {
 
 const initViewer = async () => {
   if (!container.value) return;
+  const currentRequestId = ++initRequestId;
   errorMessage.value = '';
   isLoading.value = false;
   hasStarted.value = false;
+  clearResizeObserver();
   clearViewer();
 
   if (!props.src) {
@@ -106,6 +115,7 @@ const initViewer = async () => {
 
   try {
     const marmoset = await loadMarmoset();
+    if (currentRequestId !== initRequestId || !container.value) return;
     marmoset.transparentBackground = props.transparent;
     marmoset.noUserInterface = props.noUI;
 
@@ -121,6 +131,10 @@ const initViewer = async () => {
       isLoading.value = false;
       hasStarted.value = true;
     };
+    viewerInstance.onError = () => {
+      isLoading.value = false;
+      errorMessage.value = '模型加载失败，请检查文件路径或资源是否存在';
+    };
     container.value.appendChild(viewerInstance.domRoot);
 
     if (props.autoStart) {
@@ -134,8 +148,9 @@ const initViewer = async () => {
       viewerInstance?.resize?.(w, h);
     });
     resizeObserver.observe(container.value);
-  } catch (error) {
+  } catch {
     errorMessage.value = '模型加载失败，请检查文件路径或资源是否存在';
+    isLoading.value = false;
   }
 };
 
@@ -148,7 +163,8 @@ watch(
 
 onMounted(initViewer);
 onBeforeUnmount(() => {
-  if (resizeObserver) resizeObserver.disconnect();
+  initRequestId += 1;
+  clearResizeObserver();
   clearViewer();
 });
 </script>

@@ -1,5 +1,5 @@
 ﻿<template>
-  <section id="portfolio" class="portfolio" style="animation-delay: 0.3s;">
+  <section id="portfolio" ref="sectionRef" class="portfolio" style="animation-delay: 0.3s;">
     <div class="portfolio__header">
       <h2 class="portfolio__title">作品陈列</h2>
       <p class="portfolio__subtitle">精选项目呈现 · 点击缩略图切换内容</p>
@@ -9,16 +9,21 @@
       <div class="portfolio__viewer">
         <figure class="portfolio__figure">
           <transition name="fade" mode="out-in">
-            <div :key="currentItem.src || currentItem.title" class="portfolio__media">
+            <div :key="mediaRenderKey" class="portfolio__media">
               <video
                 v-if="currentItem.type === 'video'"
-                :src="currentItem.src"
+                ref="activeVideoRef"
+                :src="activeVideoSrc || undefined"
                 :poster="currentItem.thumbnail"
                 class="portfolio__media-asset"
-                loop
                 playsinline
                 controls
-                preload="metadata"
+                :preload="videoPreload"
+                controlsList="nodownload noplaybackrate"
+                disablePictureInPicture
+                @play="onVideoPlay"
+                @timeupdate="onVideoTimeUpdate"
+                @loadedmetadata="onVideoLoadedMetadata"
               >
                 您的浏览器不支持视频播放
               </video>
@@ -47,7 +52,7 @@
         </figure>
       </div>
 
-      <div class="portfolio__thumbs" ref="thumbsRef" @wheel="onThumbWheel" @scroll="onThumbScroll">
+      <div ref="thumbsRef" class="portfolio__thumbs" @wheel="onThumbWheel" @scroll="onThumbScroll">
         <div class="portfolio__thumbs-row">
           <button
             v-for="(item, index) in props.items"
@@ -84,7 +89,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import MarmosetViewer from './MarmosetViewer.vue';
 
 const props = defineProps({
@@ -95,18 +100,94 @@ const props = defineProps({
 });
 
 const currentIndex = ref(0);
+const sectionRef = ref(null);
+const activeVideoRef = ref(null);
 const thumbsRef = ref(null);
 const bounceTarget = ref(null);
 const bounceTimer = ref(null);
 const edgeRaf = ref(null);
+const sectionVisible = ref(true);
+const pageVisible = ref(typeof document === 'undefined' ? true : !document.hidden);
+const activeVideoSrc = ref('');
+const visibilityObserver = ref(null);
+const videoProgressMap = new Map();
 
 const currentItem = computed(() => {
   return Array.isArray(props.items) && props.items.length > 0 ? props.items[currentIndex.value] : {};
 });
 
+const isCurrentItemVideo = computed(() => currentItem.value?.type === 'video');
+const shouldKeepPlaybackActive = computed(() => isCurrentItemVideo.value && sectionVisible.value && pageVisible.value);
+const videoPreload = computed(() => (isCurrentItemVideo.value ? 'metadata' : 'none'));
+const mediaRenderKey = computed(() => {
+  if (!currentItem.value) return 'empty-item';
+  if (currentItem.value.type === 'video') {
+    return `${currentItem.value.title || 'video'}-${activeVideoSrc.value || 'poster'}`;
+  }
+  return currentItem.value.src || currentItem.value.title || 'media-item';
+});
+
+const shouldPreferLowSpecSource = () => {
+  if (typeof window === 'undefined') return false;
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const lowMemory = Number(navigator.deviceMemory || 8) <= 4;
+  const connection = navigator.connection;
+  const saveData = Boolean(connection?.saveData);
+  const slowNetwork = ['slow-2g', '2g', '3g'].includes(connection?.effectiveType || '');
+  return reducedMotion || lowMemory || saveData || slowNetwork;
+};
+
+const pickVideoSource = (item) => {
+  if (!item || item.type !== 'video') return '';
+  if (shouldPreferLowSpecSource() && item.srcLow) return item.srcLow;
+  return item.src;
+};
+
+const pauseActiveVideo = () => {
+  const video = activeVideoRef.value;
+  if (!video) return;
+  video.pause();
+};
+
+const syncVideoSource = () => {
+  if (!isCurrentItemVideo.value) {
+    activeVideoSrc.value = '';
+    pauseActiveVideo();
+    return;
+  }
+  activeVideoSrc.value = pickVideoSource(currentItem.value);
+};
+
 const selectItem = (index) => {
   if (index === currentIndex.value) return;
   currentIndex.value = index;
+};
+
+const onVideoPlay = () => {
+  if (shouldKeepPlaybackActive.value) return;
+  const video = activeVideoRef.value;
+  if (!video) return;
+  video.pause();
+};
+
+const onVideoTimeUpdate = () => {
+  const video = activeVideoRef.value;
+  const key = activeVideoSrc.value;
+  if (!video || !key) return;
+  videoProgressMap.set(key, video.currentTime);
+};
+
+const onVideoLoadedMetadata = () => {
+  const video = activeVideoRef.value;
+  const key = activeVideoSrc.value;
+  if (!video || !key) return;
+  const savedTime = videoProgressMap.get(key);
+  if (typeof savedTime !== 'number' || Number.isNaN(savedTime)) return;
+  if (savedTime <= 0) return;
+  const safeTime = Math.min(savedTime, Math.max((video.duration || 0) - 0.35, 0));
+  if (safeTime > 0) {
+    video.currentTime = safeTime;
+  }
 };
 
 const onThumbWheel = (event) => {
@@ -159,7 +240,57 @@ const triggerBounce = (target) => {
   }, 420);
 };
 
+const handlePageVisibilityChange = () => {
+  pageVisible.value = !document.hidden;
+};
+
+onMounted(() => {
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', handlePageVisibilityChange, { passive: true });
+  }
+  if (typeof window !== 'undefined' && sectionRef.value && 'IntersectionObserver' in window) {
+    visibilityObserver.value = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        sectionVisible.value = Boolean(entry?.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    visibilityObserver.value.observe(sectionRef.value);
+  }
+  syncVideoSource();
+});
+
+watch(
+  () => currentIndex.value,
+  async () => {
+    onVideoTimeUpdate();
+    pauseActiveVideo();
+    await nextTick();
+    syncVideoSource();
+  }
+);
+
+watch(
+  () => shouldKeepPlaybackActive.value,
+  () => {
+    if (!shouldKeepPlaybackActive.value) {
+      onVideoTimeUpdate();
+      pauseActiveVideo();
+    }
+  }
+);
+
 onBeforeUnmount(() => {
+  onVideoTimeUpdate();
+  pauseActiveVideo();
+  if (visibilityObserver.value) {
+    visibilityObserver.value.disconnect();
+    visibilityObserver.value = null;
+  }
+  if (typeof document !== 'undefined') {
+    document.removeEventListener('visibilitychange', handlePageVisibilityChange);
+  }
   if (bounceTimer.value) {
     clearTimeout(bounceTimer.value);
     bounceTimer.value = null;

@@ -79,6 +79,13 @@ export const portfolioItems = [
     description: 'Marmoset Viewer 渲染展示'
   },
   {
+    type: 'video',
+    src: '/assets/works/Gun/Seq_Weapon_Main_web.mp4',
+    thumbnail: '/assets/works/Gun/Pic_AR_04.png',
+    title: '硬表面枪械',
+    description: '硬表面枪械动画展示'
+  },
+  {
     type: 'image',
     src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_01.png',
     thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_01.png',
@@ -204,3 +211,4 @@ export const newsTicker = {
     '欢迎一起交流合作'
   ]
 };
+ 

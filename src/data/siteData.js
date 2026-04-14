@@ -223,12 +223,12 @@ export const contactInfo = [
 
 export const newsTicker = {
   topMessages: [
+    '感谢你的关注',
     '欢迎来到我的个人站点',
-    '编程学习中ing~',
     '正在发布新的作品集',
-    '学习是第一驱动力',
+    '持续学习中ing',
     '新增了交互动效展示',
-    '感谢你的关注'
+    '感谢你的关注',
   ],
   bottomMessages: [
     '建模PBR全流程',
@@ -239,4 +239,21 @@ export const newsTicker = {
     '欢迎一起交流合作'
   ]
 };
+
+const withBaseUrl = (value) => {
+  if (typeof value !== 'string' || !value.startsWith('/')) return value;
+  return `${import.meta.env.BASE_URL}${value.slice(1)}`;
+};
+
+const normalizeAssetPaths = (record) => {
+  if (!record || typeof record !== 'object') return;
+  ['avatar', 'src', 'thumbnail', 'file'].forEach((key) => {
+    if (!(key in record)) return;
+    record[key] = withBaseUrl(record[key]);
+  });
+};
+
+normalizeAssetPaths(profile);
+portfolioItems.forEach(normalizeAssetPaths);
+pdfSections.forEach(normalizeAssetPaths);
  

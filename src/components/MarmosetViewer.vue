@@ -72,6 +72,7 @@ const loadMarmoset = () => {
     return Promise.resolve(window.marmoset);
   }
   const promiseKey = '__marmosetViewerScriptPromise__';
+  const scriptSrc = 'https://viewer.marmoset.co/main/marmoset.js';
   if (window[promiseKey]) {
     return window[promiseKey];
   }
@@ -79,19 +80,42 @@ const loadMarmoset = () => {
   window[promiseKey] = new Promise((resolve, reject) => {
     const existingScript = document.querySelector('script[data-marmoset-viewer="true"]');
     if (existingScript) {
-      existingScript.addEventListener('load', () => resolve(window.marmoset), { once: true });
-      existingScript.addEventListener('error', () => reject(new Error('Marmoset viewer script failed to load')), {
-        once: true
-      });
-      return;
+      if (existingScript.dataset.loadState === 'loaded' && window.marmoset) {
+        resolve(window.marmoset);
+        return;
+      }
+      if (existingScript.dataset.loadState === 'error') {
+        existingScript.remove();
+      } else {
+        existingScript.addEventListener('load', () => resolve(window.marmoset), { once: true });
+        existingScript.addEventListener(
+          'error',
+          () => {
+            existingScript.dataset.loadState = 'error';
+            delete window[promiseKey];
+            reject(new Error('Marmoset viewer script failed to load'));
+          },
+          { once: true }
+        );
+        return;
+      }
     }
 
     const script = document.createElement('script');
-    script.src = 'https://viewer.marmoset.co/main/marmoset.js';
+    script.src = scriptSrc;
     script.async = true;
     script.dataset.marmosetViewer = 'true';
-    script.onload = () => resolve(window.marmoset);
-    script.onerror = () => reject(new Error('Marmoset viewer script failed to load'));
+    script.dataset.loadState = 'loading';
+    script.onload = () => {
+      script.dataset.loadState = 'loaded';
+      resolve(window.marmoset);
+    };
+    script.onerror = () => {
+      script.dataset.loadState = 'error';
+      delete window[promiseKey];
+      script.remove();
+      reject(new Error('Marmoset viewer script failed to load'));
+    };
     document.head.appendChild(script);
   });
 

@@ -154,6 +154,34 @@ export const portfolioItems = [
     thumbnail: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.png',
     title: '废弃公寓',
     description: '写实风格场景展示'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/Buildings/Pic_Buildings_01.png',
+    thumbnail: '/assets/works/Buildings/Pic_Buildings_01.png',
+    title: '宠物店',
+    description: '建筑场景静帧展示'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/Buildings/Pic_Buildings_02.png',
+    thumbnail: '/assets/works/Buildings/Pic_Buildings_02.png',
+    title: '宠物店',
+    description: '建筑场景静帧展示'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/Buildings/Pic_Buildings_03.png',
+    thumbnail: '/assets/works/Buildings/Pic_Buildings_03.png',
+    title: '宠物店',
+    description: '建筑场景静帧展示'
+  },
+  {
+    type: 'marmoset',
+    src: '/assets/models/MVS_Buildings.mview',
+    thumbnail: '/assets/works/Buildings/Pic_Buildings_01.png',
+    title: '宠物店',
+    description: 'Marmoset Viewer 渲染展示'
   }
 ];
 

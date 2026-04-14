@@ -3,10 +3,17 @@
     <div ref="container" class="marmoset-viewer__stage"></div>
 
     <div v-if="showPlayOverlay" class="marmoset-viewer__overlay">
-      <button type="button" class="marmoset-viewer__play" @click="startLoading">
+      <button
+        type="button"
+        class="marmoset-viewer__play"
+        :disabled="!isViewerReady || isLoading"
+        @click="startLoading"
+      >
         ▶
       </button>
-      <div class="marmoset-viewer__overlay-text">点击播放预览</div>
+      <div class="marmoset-viewer__overlay-text">
+        {{ isViewerReady ? '点击播放预览' : '预览器初始化中…' }}
+      </div>
     </div>
 
     <div v-if="isLoading" class="marmoset-viewer__loading">
@@ -51,37 +58,52 @@ const container = ref(null);
 const errorMessage = ref('');
 const isLoading = ref(false);
 const hasStarted = ref(false);
+const isViewerReady = ref(false);
 
 const showPlayOverlay = computed(() => !hasStarted.value && !isLoading.value && !errorMessage.value);
 
 let viewerInstance = null;
 let resizeObserver = null;
 let initRequestId = 0;
+let pendingStart = false;
 
-const loadMarmoset = (() => {
-  let promise;
-  return () => {
-    if (promise) return promise;
-    promise = new Promise((resolve, reject) => {
-      if (window.marmoset) {
-        resolve(window.marmoset);
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = 'https://viewer.marmoset.co/main/marmoset.js';
-      script.async = true;
-      script.onload = () => resolve(window.marmoset);
-      script.onerror = () => reject(new Error('Marmoset viewer script failed to load'));
-      document.head.appendChild(script);
-    });
-    return promise;
-  };
-})();
+const loadMarmoset = () => {
+  if (window.marmoset) {
+    return Promise.resolve(window.marmoset);
+  }
+  const promiseKey = '__marmosetViewerScriptPromise__';
+  if (window[promiseKey]) {
+    return window[promiseKey];
+  }
+
+  window[promiseKey] = new Promise((resolve, reject) => {
+    const existingScript = document.querySelector('script[data-marmoset-viewer="true"]');
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve(window.marmoset), { once: true });
+      existingScript.addEventListener('error', () => reject(new Error('Marmoset viewer script failed to load')), {
+        once: true
+      });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://viewer.marmoset.co/main/marmoset.js';
+    script.async = true;
+    script.dataset.marmosetViewer = 'true';
+    script.onload = () => resolve(window.marmoset);
+    script.onerror = () => reject(new Error('Marmoset viewer script failed to load'));
+    document.head.appendChild(script);
+  });
+
+  return window[promiseKey];
+};
 
 const clearViewer = () => {
-  if (viewerInstance && viewerInstance.domRoot && viewerInstance.domRoot.parentNode) {
+  if (viewerInstance) {
     viewerInstance.unload?.();
-    viewerInstance.domRoot.parentNode.removeChild(viewerInstance.domRoot);
+    if (viewerInstance.domRoot && viewerInstance.domRoot.parentNode) {
+      viewerInstance.domRoot.parentNode.removeChild(viewerInstance.domRoot);
+    }
   }
   viewerInstance = null;
 };
@@ -93,8 +115,12 @@ const clearResizeObserver = () => {
 };
 
 const startLoading = () => {
-  if (!viewerInstance) return;
+  if (!viewerInstance) {
+    pendingStart = true;
+    return;
+  }
   if (hasStarted.value || isLoading.value) return;
+  pendingStart = false;
   isLoading.value = true;
   viewerInstance.loadScene();
 };
@@ -105,6 +131,8 @@ const initViewer = async () => {
   errorMessage.value = '';
   isLoading.value = false;
   hasStarted.value = false;
+  isViewerReady.value = false;
+  pendingStart = Boolean(props.autoStart);
   clearResizeObserver();
   clearViewer();
 
@@ -127,17 +155,21 @@ const initViewer = async () => {
     if (props.thumbnail) {
       viewerInstance.thumbnailURL = props.thumbnail;
     }
+    isViewerReady.value = true;
+
     viewerInstance.onLoad = () => {
       isLoading.value = false;
       hasStarted.value = true;
+      pendingStart = false;
     };
     viewerInstance.onError = () => {
       isLoading.value = false;
+      pendingStart = false;
       errorMessage.value = '模型加载失败，请检查文件路径或资源是否存在';
     };
     container.value.appendChild(viewerInstance.domRoot);
 
-    if (props.autoStart) {
+    if (pendingStart) {
       startLoading();
     }
 
@@ -151,6 +183,8 @@ const initViewer = async () => {
   } catch {
     errorMessage.value = '模型加载失败，请检查文件路径或资源是否存在';
     isLoading.value = false;
+    isViewerReady.value = false;
+    pendingStart = false;
   }
 };
 
@@ -164,6 +198,7 @@ watch(
 onMounted(initViewer);
 onBeforeUnmount(() => {
   initRequestId += 1;
+  pendingStart = false;
   clearResizeObserver();
   clearViewer();
 });
@@ -219,6 +254,12 @@ onBeforeUnmount(() => {
 .marmoset-viewer__play:hover {
   transform: scale(1.05);
   border-color: rgba(125, 211, 252, 0.9);
+}
+
+.marmoset-viewer__play:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .marmoset-viewer__overlay-text {

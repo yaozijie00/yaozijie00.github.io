@@ -84,6 +84,14 @@ const closeMenu = () => {
   isMenuOpen.value = false;
 };
 
+const syncBodyScrollLock = () => {
+  if (window.innerWidth >= 768) {
+    document.body.style.overflow = '';
+    return;
+  }
+  document.body.style.overflow = isMenuOpen.value ? 'hidden' : '';
+};
+
 const BOTTOM_TOLERANCE = 6;
 
 const isAtBottom = () => {
@@ -229,6 +237,10 @@ onMounted(() => {
     }
     resizeRaf = requestAnimationFrame(() => {
       resizeRaf = null;
+      if (window.innerWidth >= 768 && isMenuOpen.value) {
+        isMenuOpen.value = false;
+      }
+      syncBodyScrollLock();
       updateIndicator();
     });
   };
@@ -237,9 +249,8 @@ onMounted(() => {
 
 watch(
   () => isMenuOpen.value,
-  (open) => {
-    if (window.innerWidth >= 768) return;
-    document.body.style.overflow = open ? 'hidden' : '';
+  () => {
+    syncBodyScrollLock();
   }
 );
 

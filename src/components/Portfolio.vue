@@ -7,7 +7,7 @@
 
     <div class="portfolio__panel">
       <div class="portfolio__viewer">
-        <figure class="portfolio__figure">
+        <figure v-if="currentItem" class="portfolio__figure">
           <transition name="fade" mode="out-in">
             <div :key="mediaRenderKey" class="portfolio__media">
               <video
@@ -50,9 +50,16 @@
             </div>
           </transition>
         </figure>
+        <div v-else class="portfolio__empty">暂无可展示作品</div>
       </div>
 
-      <div ref="thumbsRef" class="portfolio__thumbs" @wheel="onThumbWheel" @scroll="onThumbScroll">
+      <div
+        v-if="hasItems"
+        ref="thumbsRef"
+        class="portfolio__thumbs"
+        @wheel="onThumbWheel"
+        @scroll="onThumbScroll"
+      >
         <div class="portfolio__thumbs-row">
           <button
             v-for="(item, index) in props.items"
@@ -112,8 +119,12 @@ const activeVideoSrc = ref('');
 const visibilityObserver = ref(null);
 const videoProgressMap = new Map();
 
+const hasItems = computed(() => Array.isArray(props.items) && props.items.length > 0);
+
 const currentItem = computed(() => {
-  return Array.isArray(props.items) && props.items.length > 0 ? props.items[currentIndex.value] : {};
+  if (!hasItems.value) return null;
+  const safeIndex = Math.min(Math.max(currentIndex.value, 0), props.items.length - 1);
+  return props.items[safeIndex] || null;
 });
 
 const isCurrentItemVideo = computed(() => currentItem.value?.type === 'video');
@@ -159,6 +170,8 @@ const syncVideoSource = () => {
 };
 
 const selectItem = (index) => {
+  if (!hasItems.value) return;
+  if (index < 0 || index >= props.items.length) return;
   if (index === currentIndex.value) return;
   currentIndex.value = index;
 };
@@ -262,6 +275,19 @@ onMounted(() => {
 });
 
 watch(
+  () => props.items.length,
+  () => {
+    if (!hasItems.value) {
+      currentIndex.value = 0;
+      return;
+    }
+    if (currentIndex.value >= props.items.length) {
+      currentIndex.value = props.items.length - 1;
+    }
+  }
+);
+
+watch(
   () => currentIndex.value,
   async () => {
     onVideoTimeUpdate();
@@ -342,6 +368,17 @@ onBeforeUnmount(() => {
   border-radius: 1rem;
   overflow: hidden;
   position: relative;
+  @include glass-strong;
+}
+
+.portfolio__empty {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
   @include glass-strong;
 }
 

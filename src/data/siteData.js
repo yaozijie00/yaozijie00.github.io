@@ -57,33 +57,12 @@ export const timelineData = [
 ];
 
 export const portfolioItems = [
-  {
+   {
     type: 'image',
-    src: '/assets/works/Gun/Pic_AR_01.png',
-    thumbnail: '/assets/works/Gun/Pic_AR_01.png',
-    title: '硬表面枪械',
-    description: '硬表面模型制作'
-  },
-  {
-    type: 'image',
-    src: '/assets/works/Gun/Pic_AR_02.png',
-    thumbnail: '/assets/works/Gun/Pic_AR_02.png',
-    title: '硬表面枪械',
-    description: '硬表面模型制作'
-  },
-  {
-    type: 'marmoset',
-    src: '/assets/models/MVS_AR.mview',
-    thumbnail: '/assets/works/Gun/Pic_AR_03.png',
-    title: '硬表面枪械',
-    description: 'Marmoset Viewer 渲染展示'
-  },
-  {
-    type: 'video',
-    src: '/assets/works/Gun/Seq_Weapon_Main_web.mp4',
-    thumbnail: '/assets/works/Gun/Pic_AR_04.png',
-    title: '硬表面枪械',
-    description: '硬表面枪械动画展示'
+    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
+    title: '森林环境',
+    description: '全流程森林场景构建'
   },
   {
     type: 'image',
@@ -112,13 +91,6 @@ export const portfolioItems = [
     thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_04.png',
     title: '植物资产',
     description: 'ST植物资产制作'
-  },
-  {
-    type: 'image',
-    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
-    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
-    title: '森林环境',
-    description: '全流程森林场景构建'
   },
   {
     type: 'image',
@@ -154,6 +126,48 @@ export const portfolioItems = [
     thumbnail: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.png',
     title: '废弃公寓',
     description: '写实风格场景展示'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/CyberCity/Pic_CyberCity_01.png',
+    thumbnail: '/assets/works/CyberCity/Pic_CyberCity_01.png',
+    title: 'CyberCity',
+    description: '赛博城市场景静帧展示'
+  },
+  {
+    type: 'video',
+    src: '/assets/works/CyberCity/CyberCity_Final_web.mp4',
+    thumbnail: '/assets/works/CyberCity/Pic_CyberCity_01.png',
+    title: 'CyberCity',
+    description: '赛博城市场景动画展示'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/Gun/Pic_AR_01.png',
+    thumbnail: '/assets/works/Gun/Pic_AR_01.png',
+    title: '硬表面枪械',
+    description: '硬表面模型制作'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/Gun/Pic_AR_02.png',
+    thumbnail: '/assets/works/Gun/Pic_AR_02.png',
+    title: '硬表面枪械',
+    description: '硬表面模型制作'
+  },
+  {
+    type: 'marmoset',
+    src: '/assets/models/MVS_AR.mview',
+    thumbnail: '/assets/works/Gun/Pic_AR_03.png',
+    title: '硬表面枪械',
+    description: 'Marmoset Viewer 渲染展示'
+  },
+  {
+    type: 'video',
+    src: '/assets/works/Gun/Seq_Weapon_Main_web.mp4',
+    thumbnail: '/assets/works/Gun/Pic_AR_04.png',
+    title: '硬表面枪械',
+    description: '硬表面枪械动画展示'
   },
   {
     type: 'image',

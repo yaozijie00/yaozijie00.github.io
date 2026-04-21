@@ -129,7 +129,7 @@ const currentItem = computed(() => {
 
 const isCurrentItemVideo = computed(() => currentItem.value?.type === 'video');
 const shouldKeepPlaybackActive = computed(() => isCurrentItemVideo.value && sectionVisible.value && pageVisible.value);
-const videoPreload = computed(() => (isCurrentItemVideo.value ? 'metadata' : 'none'));
+const videoPreload = 'none';
 const mediaRenderKey = computed(() => {
   if (!currentItem.value) return 'empty-item';
   if (currentItem.value.type === 'video') {

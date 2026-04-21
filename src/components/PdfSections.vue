@@ -3,7 +3,6 @@
     v-for="section in sections"
     :id="section.id"
     :key="section.id"
-    :ref="(el) => setPdfSectionRef(el, section.id)"
     class="pdf"
     style="animation-delay: 0.4s;"
   >
@@ -15,13 +14,24 @@
     <div class="pdf__panel">
       <div class="pdf__viewer">
         <iframe
-          :src="isPdfLoaded(section.id) ? section.file : undefined"
+          v-if="isPdfLoaded(section.id)"
+          :src="section.file"
           class="pdf__frame"
           :title="section.title"
           loading="lazy"
         >
           您的浏览器不支持内嵌 PDF 预览，请点击下方按钮下载。
         </iframe>
+        <div v-else class="pdf__placeholder">
+          <p class="pdf__placeholder-text">为保证页面流畅，PDF 预览按需加载。</p>
+          <button
+            type="button"
+            class="pdf__btn pdf__btn--ghost"
+            @click="loadPreview(section.id)"
+          >
+            点击加载预览
+          </button>
+        </div>
       </div>
 
       <div class="pdf__actions">
@@ -51,7 +61,7 @@
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { ref } from 'vue';
 
 defineProps({
   sections: {
@@ -60,14 +70,7 @@ defineProps({
   }
 });
 
-const pdfSectionRefs = ref({});
 const loadedPdfMap = ref({});
-let pdfObserver = null;
-
-const setPdfSectionRef = (el, id) => {
-  if (!el) return;
-  pdfSectionRefs.value[id] = el;
-};
 
 const markPdfLoaded = (id) => {
   if (loadedPdfMap.value[id]) return;
@@ -78,42 +81,12 @@ const markPdfLoaded = (id) => {
 };
 
 const isPdfLoaded = (id) => Boolean(loadedPdfMap.value[id]);
+const loadPreview = (id) => markPdfLoaded(id);
 
 const openNewTab = (url) => {
   const win = window.open(url, '_blank', 'noopener');
   if (win) win.opener = null;
 };
-
-onMounted(async () => {
-  await nextTick();
-  if (!('IntersectionObserver' in window)) {
-    Object.keys(pdfSectionRefs.value).forEach(markPdfLoaded);
-    return;
-  }
-  pdfObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const id = entry.target.id;
-        if (!id) return;
-        markPdfLoaded(id);
-        pdfObserver?.unobserve(entry.target);
-      });
-    },
-    {
-      rootMargin: '300px 0px'
-    }
-  );
-
-  Object.values(pdfSectionRefs.value).forEach((el) => {
-    pdfObserver?.observe(el);
-  });
-});
-
-onBeforeUnmount(() => {
-  pdfObserver?.disconnect();
-  pdfObserver = null;
-});
 </script>
 
 <style scoped lang="scss">
@@ -156,6 +129,26 @@ onBeforeUnmount(() => {
   border: none;
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.05);
+}
+
+.pdf__placeholder {
+  width: 100%;
+  height: 24rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: #d1d5db;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.pdf__placeholder-text {
+  max-width: 32rem;
+  line-height: 1.65;
 }
 
 .pdf__actions {
@@ -204,6 +197,10 @@ onBeforeUnmount(() => {
   }
 
   .pdf__frame {
+    height: 31.25rem;
+  }
+
+  .pdf__placeholder {
     height: 31.25rem;
   }
 }

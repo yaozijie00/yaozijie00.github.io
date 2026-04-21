@@ -9,10 +9,10 @@
 
 export const profile = {
   name: '姚梓杰',
-  role: '求职方向：关卡美术 / 环境美术',
+  role: '求职方向：环境美术/3D场景美术',
   intro:
     '专注于建模与环境美术、关卡美术的综合实践。具备1年相关工作经验，擅长场景搭建、植物资源制作、模型制作与灯光氛围塑造，持续以严谨流程与审美判断提升画面品质。',
-  avatar: '/images/avatar.png',
+  avatar: '/images/avatar.webp',
   tags: ['建模', '地编', '植物资产', '场景搭建', '灯光氛围', '流程协作', '审美判断']
 };
 
@@ -31,7 +31,7 @@ export const techStack = [
 export const timelineData = [
   {
     company: '深圳市飞渡科技有限公司',
-    position: '地编 | 美术部',
+    position: '3D场景美术 | 美术部',
     period: '2025/07/01 - 2026/04/08',
     type: 'work',
     description:
@@ -40,7 +40,7 @@ export const timelineData = [
   },
   {
     company: '深圳市飞渡科技有限公司',
-    position: '地编 | 美术部',
+    position: '3D场景美术 | 美术部',
     period: '2025/04/08 - 2025/07/01',
     type: 'internship',
     description:
@@ -57,143 +57,175 @@ export const timelineData = [
 ];
 
 export const portfolioItems = [
-   {
+  {
     type: 'image',
-    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
-    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
+    src: '/assets/works/Telephone/pic_Telephone_01.webp',
+    thumbnail: '/assets/works/Telephone/pic_Telephone_01.webp',
+    title: 'Telephone',
+    description: '电话亭模型与材质展示'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/Telephone/pic_Telephone_02.webp',
+    thumbnail: '/assets/works/Telephone/pic_Telephone_02.webp',
+    title: 'Telephone',
+    description: '电话亭模型与材质展示'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/Telephone/pic_Telephone_03.webp',
+    thumbnail: '/assets/works/Telephone/pic_Telephone_03.webp',
+    title: 'Telephone',
+    description: '电话亭模型与材质展示'
+  },
+  {
+    type: 'marmoset',
+    src: '/assets/models/MVS_Telephone.mview',
+    thumbnail: '/assets/works/Telephone/pic_Telephone_01.webp',
+    title: 'Telephone',
+    description: 'Marmoset Viewer 渲染展示'
+  },
+  {
+    type: 'image',
+    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.webp',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.webp',
     title: '森林环境',
     description: '全流程森林场景构建'
   },
   {
     type: 'image',
-    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_01.png',
-    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_01.png',
+    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_01.webp',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_01.webp',
     title: '植物资产',
     description: 'ST植物资产制作'
   },
   {
     type: 'image',
-    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_02.png',
-    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_02.png',
+    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_02.webp',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_02.webp',
     title: '植物资产',
     description: 'ST植物资产制作'
   },
   {
     type: 'image',
-    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_03.png',
-    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_03.png',
+    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_03.webp',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_03.webp',
     title: '植物资产',
     description: 'ST植物资产制作'
   },
   {
     type: 'image',
-    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_04.png',
-    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_04.png',
+    src: '/assets/works/ForestEnviroment/Pic_FoliageAssests_04.webp',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_FoliageAssests_04.webp',
     title: '植物资产',
     description: 'ST植物资产制作'
   },
   {
     type: 'image',
-    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_02.png',
-    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_02.png',
+    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_02.webp',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_02.webp',
     title: '森林环境',
     description: '全流程森林场景构建'
   },
   {
     type: 'image',
-    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_03.png',
-    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_03.png',
+    src: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_03.webp',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_03.webp',
     title: '森林环境',
     description: '全流程森林场景构建'
   },
   {
     type: 'video',
     src: '/assets/works/ForestEnviroment/ForestEnviroment_Final_web.mp4',
-    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.png',
+    srcLow: '/assets/works/ForestEnviroment/ForestEnviroment_Final_web_low.mp4',
+    thumbnail: '/assets/works/ForestEnviroment/Pic_ForestEnviroment_01.webp',
     title: '森林环境',
     description: '全流程森林场景构建'
   },
   {
     type: 'image',
-    src: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.png',
-    thumbnail: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.png',
+    src: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.webp',
+    thumbnail: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.webp',
     title: '废弃公寓',
     description: '写实场景氛围静帧'
   },
   {
     type: 'video',
     src: '/assets/works/AbandonRoom/AbandonedRoom_Final_web.mp4',
-    thumbnail: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.png',
+    srcLow: '/assets/works/AbandonRoom/AbandonedRoom_Final_web_low.mp4',
+    thumbnail: '/assets/works/AbandonRoom/Pic_AbandonedRoom_Final.webp',
     title: '废弃公寓',
     description: '写实风格场景展示'
   },
   {
     type: 'image',
-    src: '/assets/works/CyberCity/Pic_CyberCity_01.png',
-    thumbnail: '/assets/works/CyberCity/Pic_CyberCity_01.png',
+    src: '/assets/works/CyberCity/Pic_CyberCity_01.webp',
+    thumbnail: '/assets/works/CyberCity/Pic_CyberCity_01.webp',
     title: 'CyberCity',
     description: '赛博城市场景静帧展示'
   },
   {
     type: 'video',
     src: '/assets/works/CyberCity/CyberCity_Final_web.mp4',
-    thumbnail: '/assets/works/CyberCity/Pic_CyberCity_01.png',
+    srcLow: '/assets/works/CyberCity/CyberCity_Final_web_low.mp4',
+    thumbnail: '/assets/works/CyberCity/Pic_CyberCity_01.webp',
     title: 'CyberCity',
     description: '赛博城市场景动画展示'
   },
   {
     type: 'image',
-    src: '/assets/works/Gun/Pic_AR_01.png',
-    thumbnail: '/assets/works/Gun/Pic_AR_01.png',
+    src: '/assets/works/Gun/Pic_AR_01.webp',
+    thumbnail: '/assets/works/Gun/Pic_AR_01.webp',
     title: '硬表面枪械',
     description: '硬表面模型制作'
   },
   {
     type: 'image',
-    src: '/assets/works/Gun/Pic_AR_02.png',
-    thumbnail: '/assets/works/Gun/Pic_AR_02.png',
+    src: '/assets/works/Gun/Pic_AR_02.webp',
+    thumbnail: '/assets/works/Gun/Pic_AR_02.webp',
     title: '硬表面枪械',
     description: '硬表面模型制作'
   },
   {
     type: 'marmoset',
     src: '/assets/models/MVS_AR.mview',
-    thumbnail: '/assets/works/Gun/Pic_AR_03.png',
+    thumbnail: '/assets/works/Gun/Pic_AR_03.webp',
     title: '硬表面枪械',
     description: 'Marmoset Viewer 渲染展示'
   },
   {
     type: 'video',
     src: '/assets/works/Gun/Seq_Weapon_Main_web.mp4',
-    thumbnail: '/assets/works/Gun/Pic_AR_04.png',
+    srcLow: '/assets/works/Gun/Seq_Weapon_Main_web_low.mp4',
+    thumbnail: '/assets/works/Gun/Pic_AR_04.webp',
     title: '硬表面枪械',
     description: '硬表面枪械动画展示'
   },
   {
     type: 'image',
-    src: '/assets/works/Buildings/Pic_Buildings_01.png',
-    thumbnail: '/assets/works/Buildings/Pic_Buildings_01.png',
+    src: '/assets/works/Buildings/Pic_Buildings_01.webp',
+    thumbnail: '/assets/works/Buildings/Pic_Buildings_01.webp',
     title: '宠物店',
     description: '建筑场景静帧展示'
   },
   {
     type: 'image',
-    src: '/assets/works/Buildings/Pic_Buildings_02.png',
-    thumbnail: '/assets/works/Buildings/Pic_Buildings_02.png',
+    src: '/assets/works/Buildings/Pic_Buildings_02.webp',
+    thumbnail: '/assets/works/Buildings/Pic_Buildings_02.webp',
     title: '宠物店',
     description: '建筑场景静帧展示'
   },
   {
     type: 'image',
-    src: '/assets/works/Buildings/Pic_Buildings_03.png',
-    thumbnail: '/assets/works/Buildings/Pic_Buildings_03.png',
+    src: '/assets/works/Buildings/Pic_Buildings_03.webp',
+    thumbnail: '/assets/works/Buildings/Pic_Buildings_03.webp',
     title: '宠物店',
     description: '建筑场景静帧展示'
   },
   {
     type: 'marmoset',
     src: '/assets/models/MVS_Buildings.mview',
-    thumbnail: '/assets/works/Buildings/Pic_Buildings_01.png',
+    thumbnail: '/assets/works/Buildings/Pic_Buildings_01.webp',
     title: '宠物店',
     description: 'Marmoset Viewer 渲染展示'
   }
@@ -261,7 +293,7 @@ const withBaseUrl = (value) => {
 
 const normalizeAssetPaths = (record) => {
   if (!record || typeof record !== 'object') return;
-  ['avatar', 'src', 'thumbnail', 'file'].forEach((key) => {
+  ['avatar', 'src', 'srcLow', 'thumbnail', 'file'].forEach((key) => {
     if (!(key in record)) return;
     record[key] = withBaseUrl(record[key]);
   });

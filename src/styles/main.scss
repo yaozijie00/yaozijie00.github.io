@@ -154,11 +154,22 @@ video::-webkit-media-controls-play-button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 640px) {
+  body::after {
+    opacity: 0.32;
+    filter: blur(34px);
   }
 }

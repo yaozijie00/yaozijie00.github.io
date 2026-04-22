@@ -38,8 +38,10 @@
                 :src="currentItem.src"
                 :alt="currentItem.title"
                 class="portfolio__media-asset"
-                loading="lazy"
+                loading="eager"
                 decoding="async"
+                fetchpriority="high"
+                draggable="false"
               />
               <figcaption class="portfolio__caption">
                 <h3 class="portfolio__caption-title">{{ currentItem.title }}</h3>
@@ -57,7 +59,7 @@
         v-if="hasItems"
         ref="thumbsRef"
         class="portfolio__thumbs"
-        @wheel="onThumbWheel"
+        @wheel.stop.prevent="onThumbWheel"
         @scroll="onThumbScroll"
       >
         <div class="portfolio__thumbs-row">
@@ -65,6 +67,7 @@
             v-for="(item, index) in props.items"
             :key="`${item.type}-${item.src}-${index}`"
             type="button"
+            :aria-label="`${item.title} - ${mediaTypeLabel(item.type)}`"
             :class="[
               'portfolio__thumb',
               index === currentIndex ? 'portfolio__thumb--active' : '',
@@ -83,9 +86,7 @@
             <div class="portfolio__thumb-overlay"></div>
             <div class="portfolio__thumb-info">
               <p class="portfolio__thumb-title">{{ item.title }}</p>
-              <p class="portfolio__thumb-type">
-                {{ item.type === 'video' ? '视频' : item.type === 'marmoset' ? 'Marmoset' : '图片' }}
-              </p>
+              <p class="portfolio__thumb-type">{{ mediaTypeLabel(item.type) }}</p>
             </div>
             <div v-if="index === currentIndex" class="portfolio__thumb-border"></div>
           </button>
@@ -96,8 +97,11 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import MarmosetViewer from './MarmosetViewer.vue';
+import { getMediaTypeLabel } from './portfolio/mediaTypes.js';
+import { usePortfolioMedia } from '../composables/usePortfolioMedia.js';
+import { usePortfolioThumbScroller } from '../composables/usePortfolioThumbScroller.js';
 
 const props = defineProps({
   items: {
@@ -110,14 +114,6 @@ const currentIndex = ref(0);
 const sectionRef = ref(null);
 const activeVideoRef = ref(null);
 const thumbsRef = ref(null);
-const bounceTarget = ref(null);
-const bounceTimer = ref(null);
-const edgeRaf = ref(null);
-const sectionVisible = ref(true);
-const pageVisible = ref(typeof document === 'undefined' ? true : !document.hidden);
-const activeVideoSrc = ref('');
-const visibilityObserver = ref(null);
-const videoProgressMap = new Map();
 
 const hasItems = computed(() => Array.isArray(props.items) && props.items.length > 0);
 
@@ -127,47 +123,7 @@ const currentItem = computed(() => {
   return props.items[safeIndex] || null;
 });
 
-const isCurrentItemVideo = computed(() => currentItem.value?.type === 'video');
-const shouldKeepPlaybackActive = computed(() => isCurrentItemVideo.value && sectionVisible.value && pageVisible.value);
 const videoPreload = 'none';
-const mediaRenderKey = computed(() => {
-  if (!currentItem.value) return 'empty-item';
-  if (currentItem.value.type === 'video') {
-    return `${currentItem.value.title || 'video'}-${activeVideoSrc.value || 'poster'}`;
-  }
-  return currentItem.value.src || currentItem.value.title || 'media-item';
-});
-
-const shouldPreferLowSpecSource = () => {
-  if (typeof window === 'undefined') return false;
-  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  const lowMemory = Number(navigator.deviceMemory || 8) <= 4;
-  const connection = navigator.connection;
-  const saveData = Boolean(connection?.saveData);
-  const slowNetwork = ['slow-2g', '2g', '3g'].includes(connection?.effectiveType || '');
-  return reducedMotion || lowMemory || saveData || slowNetwork;
-};
-
-const pickVideoSource = (item) => {
-  if (!item || item.type !== 'video') return '';
-  if (shouldPreferLowSpecSource() && item.srcLow) return item.srcLow;
-  return item.src;
-};
-
-const pauseActiveVideo = () => {
-  const video = activeVideoRef.value;
-  if (!video) return;
-  video.pause();
-};
-
-const syncVideoSource = () => {
-  if (!isCurrentItemVideo.value) {
-    activeVideoSrc.value = '';
-    pauseActiveVideo();
-    return;
-  }
-  activeVideoSrc.value = pickVideoSource(currentItem.value);
-};
 
 const selectItem = (index) => {
   if (!hasItems.value) return;
@@ -176,103 +132,21 @@ const selectItem = (index) => {
   currentIndex.value = index;
 };
 
-const onVideoPlay = () => {
-  if (shouldKeepPlaybackActive.value) return;
-  const video = activeVideoRef.value;
-  if (!video) return;
-  video.pause();
+const mediaTypeLabel = (type) => {
+  return getMediaTypeLabel(type);
 };
 
-const onVideoTimeUpdate = () => {
-  const video = activeVideoRef.value;
-  const key = activeVideoSrc.value;
-  if (!video || !key) return;
-  videoProgressMap.set(key, video.currentTime);
-};
+const { bounceTarget, onThumbWheel, onThumbScroll, scrollActiveThumbIntoView } =
+  usePortfolioThumbScroller(thumbsRef);
 
-const onVideoLoadedMetadata = () => {
-  const video = activeVideoRef.value;
-  const key = activeVideoSrc.value;
-  if (!video || !key) return;
-  const savedTime = videoProgressMap.get(key);
-  if (typeof savedTime !== 'number' || Number.isNaN(savedTime)) return;
-  if (savedTime <= 0) return;
-  const safeTime = Math.min(savedTime, Math.max((video.duration || 0) - 0.35, 0));
-  if (safeTime > 0) {
-    video.currentTime = safeTime;
-  }
-};
-
-const onThumbWheel = (event) => {
-  const container = thumbsRef.value;
-  if (!container) return;
-  if (!hasThumbOverflow(container)) return;
-  event.preventDefault();
-  const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-  container.scrollLeft += delta;
-  scheduleEdgeCheck();
-};
-
-const onThumbScroll = () => {
-  scheduleEdgeCheck();
-};
-
-const hasThumbOverflow = (container) => {
-  return container.scrollWidth > container.clientWidth + 1;
-};
-
-const scheduleEdgeCheck = () => {
-  if (edgeRaf.value) return;
-  edgeRaf.value = requestAnimationFrame(() => {
-    edgeRaf.value = null;
-    checkThumbEdges();
+const { activeVideoSrc, mediaRenderKey, onVideoPlay, onVideoTimeUpdate, onVideoLoadedMetadata } =
+  usePortfolioMedia({
+    currentItem,
+    currentIndex,
+    activeVideoRef,
+    sectionRef,
+    onActiveItemReady: scrollActiveThumbIntoView
   });
-};
-
-const checkThumbEdges = () => {
-  const container = thumbsRef.value;
-  if (!container) return;
-  if (!hasThumbOverflow(container)) return;
-  const maxScroll = container.scrollWidth - container.clientWidth;
-  const edgeTolerance = 2;
-  if (container.scrollLeft <= edgeTolerance) {
-    triggerBounce('start');
-  } else if (container.scrollLeft >= maxScroll - edgeTolerance) {
-    triggerBounce('end');
-  }
-};
-
-const triggerBounce = (target) => {
-  if (bounceTimer.value) {
-    clearTimeout(bounceTimer.value);
-    bounceTimer.value = null;
-  }
-  bounceTarget.value = target;
-  bounceTimer.value = setTimeout(() => {
-    bounceTarget.value = null;
-  }, 420);
-};
-
-const handlePageVisibilityChange = () => {
-  pageVisible.value = !document.hidden;
-};
-
-onMounted(() => {
-  if (typeof document !== 'undefined') {
-    document.addEventListener('visibilitychange', handlePageVisibilityChange, { passive: true });
-  }
-  if (typeof window !== 'undefined' && sectionRef.value && 'IntersectionObserver' in window) {
-    visibilityObserver.value = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        sectionVisible.value = Boolean(entry?.isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
-    visibilityObserver.value.observe(sectionRef.value);
-  }
-  syncVideoSource();
-});
 
 watch(
   () => props.items.length,
@@ -284,48 +158,9 @@ watch(
     if (currentIndex.value >= props.items.length) {
       currentIndex.value = props.items.length - 1;
     }
+    scrollActiveThumbIntoView('auto');
   }
 );
-
-watch(
-  () => currentIndex.value,
-  async () => {
-    onVideoTimeUpdate();
-    pauseActiveVideo();
-    await nextTick();
-    syncVideoSource();
-  }
-);
-
-watch(
-  () => shouldKeepPlaybackActive.value,
-  () => {
-    if (!shouldKeepPlaybackActive.value) {
-      onVideoTimeUpdate();
-      pauseActiveVideo();
-    }
-  }
-);
-
-onBeforeUnmount(() => {
-  onVideoTimeUpdate();
-  pauseActiveVideo();
-  if (visibilityObserver.value) {
-    visibilityObserver.value.disconnect();
-    visibilityObserver.value = null;
-  }
-  if (typeof document !== 'undefined') {
-    document.removeEventListener('visibilitychange', handlePageVisibilityChange);
-  }
-  if (bounceTimer.value) {
-    clearTimeout(bounceTimer.value);
-    bounceTimer.value = null;
-  }
-  if (edgeRaf.value) {
-    cancelAnimationFrame(edgeRaf.value);
-    edgeRaf.value = null;
-  }
-});
 </script>
 
 <style scoped lang="scss">
@@ -441,6 +276,11 @@ onBeforeUnmount(() => {
 .portfolio__thumbs {
   overflow-x: auto;
   padding-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  touch-action: pan-x;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: contain;
 }
 
 .portfolio__thumbs-row {
@@ -454,6 +294,7 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
   width: 10rem;
   height: 6rem;
+  scroll-snap-align: start;
   border-radius: 0.75rem;
   overflow: hidden;
   cursor: pointer;
@@ -561,7 +402,7 @@ onBeforeUnmount(() => {
   .portfolio__caption {
     left: 0.75rem;
     right: 0.75rem;
-    bottom: 1rem;
+    bottom: 3.1rem;
     max-width: 100%;
   }
 
